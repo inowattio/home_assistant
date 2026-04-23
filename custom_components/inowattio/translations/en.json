@@ -32,12 +32,6 @@
       "machine_id": {
         "name": "Machine ID"
       },
-      "ip_address": {
-        "name": "IP address"
-      },
-      "protocol": {
-        "name": "API protocol"
-      },
       "unit_name": {
         "name": "Unit name"
       },
