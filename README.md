@@ -13,7 +13,7 @@ A local-polling Home Assistant integration for the Inowattio's Nemesis controlle
 
 ## Requirements
 
-- Home Assistant `2024.1.0` or newer.
+- Home Assistant `2026.4.3` or newer.
 - A Nemesis controller reachable on your LAN (default port `6969`).
 
 ## Installation

@@ -2,7 +2,7 @@
 
 from datetime import timedelta
 
-DOMAIN = "nemesis"
+DOMAIN = "inowattio"
 
 CONF_HOST = "host"
 CONF_PORT = "port"
