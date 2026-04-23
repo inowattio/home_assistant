@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
 import logging
 from typing import Any
 
@@ -15,8 +16,9 @@ from .api import NemesisApi
 from .api import NemesisApiError
 from .const import CONF_HOST
 from .const import CONF_PORT
+from .const import CONF_SCAN_INTERVAL_SECONDS
+from .const import DEFAULT_SCAN_INTERVAL_SECONDS
 from .const import DOMAIN
-from .const import SCAN_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -28,8 +30,13 @@ class NemesisCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         self.config_entry_id = config_entry.entry_id
-        host = config_entry.data[CONF_HOST]
-        port = config_entry.data[CONF_PORT]
+        host = config_entry.options.get(CONF_HOST, config_entry.data[CONF_HOST])
+        port = int(config_entry.options.get(CONF_PORT, config_entry.data[CONF_PORT]))
+        scan_interval_seconds = int(
+            config_entry.options.get(
+                CONF_SCAN_INTERVAL_SECONDS, DEFAULT_SCAN_INTERVAL_SECONDS
+            )
+        )
         session = async_get_clientsession(hass)
         self.api = NemesisApi(session, host, port)
         super().__init__(
@@ -37,7 +44,7 @@ class NemesisCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER,
             config_entry=config_entry,
             name=DOMAIN,
-            update_interval=SCAN_INTERVAL,
+            update_interval=timedelta(seconds=scan_interval_seconds),
         )
 
     async def _async_update_data(self) -> dict[str, Any]:

@@ -21,6 +21,22 @@
       "no_host": "Discovery did not include a host address."
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Inowattio options",
+        "description": "Update the controller connection and polling behavior.",
+        "data": {
+          "host": "Host or IP",
+          "port": "HTTP port",
+          "scan_interval_seconds": "Polling interval (seconds)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach /status and /data on that address."
+    }
+  },
   "entity": {
     "sensor": {
       "grid_power": {

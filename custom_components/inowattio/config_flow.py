@@ -7,10 +7,13 @@ from typing import Any
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigFlow
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.config_entries import ConfigFlowResult
+from homeassistant.config_entries import OptionsFlow
 from homeassistant.const import CONF_HOST
 from homeassistant.const import CONF_PORT
 from homeassistant.core import HomeAssistant
+from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 try:
@@ -22,8 +25,12 @@ from .api import NemesisApi
 from .api import NemesisApiError
 from .const import CONF_HOST as DATA_HOST
 from .const import CONF_PORT as DATA_PORT
+from .const import CONF_SCAN_INTERVAL_SECONDS
 from .const import DEFAULT_PORT
+from .const import DEFAULT_SCAN_INTERVAL_SECONDS
 from .const import DOMAIN
+from .const import MAX_SCAN_INTERVAL_SECONDS
+from .const import MIN_SCAN_INTERVAL_SECONDS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,6 +38,23 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_HOST): str,
         vol.Required(CONF_PORT, default=DEFAULT_PORT): vol.Coerce(int),
+    }
+)
+
+OPTIONS_STEP_DATA_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_HOST): str,
+        vol.Required(CONF_PORT, default=DEFAULT_PORT): vol.Coerce(int),
+        vol.Required(
+            CONF_SCAN_INTERVAL_SECONDS,
+            default=DEFAULT_SCAN_INTERVAL_SECONDS,
+        ): vol.All(
+            vol.Coerce(int),
+            vol.Range(
+                min=MIN_SCAN_INTERVAL_SECONDS,
+                max=MAX_SCAN_INTERVAL_SECONDS,
+            ),
+        ),
     }
 )
 
@@ -67,6 +91,11 @@ class NemesisConfigFlow(ConfigFlow, domain=DOMAIN):
     def __init__(self) -> None:
         self._discovered_host: str | None = None
         self._discovered_port: int = DEFAULT_PORT
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> NemesisOptionsFlow:
+        return NemesisOptionsFlow(config_entry)
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -153,5 +182,60 @@ class NemesisConfigFlow(ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="discovery_confirm",
             description_placeholders={"host": host, "port": str(port)},
+            errors=errors,
+        )
+
+
+class NemesisOptionsFlow(OptionsFlow):
+    """Handle options for the Nemesis integration."""
+
+    def __init__(self, config_entry: ConfigEntry) -> None:
+        self.config_entry = config_entry
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            try:
+                await _validate_connection(
+                    self.hass, user_input[CONF_HOST], user_input[CONF_PORT]
+                )
+            except NemesisApiError as err:
+                _LOGGER.warning("Options update failed: %s", err)
+                errors["base"] = "cannot_connect"
+            else:
+                return self.async_create_entry(
+                    title="",
+                    data={
+                        CONF_HOST: user_input[CONF_HOST],
+                        CONF_PORT: user_input[CONF_PORT],
+                        CONF_SCAN_INTERVAL_SECONDS: user_input[
+                            CONF_SCAN_INTERVAL_SECONDS
+                        ],
+                    },
+                )
+
+        current_host = self.config_entry.options.get(
+            CONF_HOST, self.config_entry.data[CONF_HOST]
+        )
+        current_port = self.config_entry.options.get(
+            CONF_PORT, self.config_entry.data[CONF_PORT]
+        )
+        current_scan_interval = self.config_entry.options.get(
+            CONF_SCAN_INTERVAL_SECONDS, DEFAULT_SCAN_INTERVAL_SECONDS
+        )
+        schema = self.add_suggested_values_to_schema(
+            OPTIONS_STEP_DATA_SCHEMA,
+            {
+                CONF_HOST: current_host,
+                CONF_PORT: current_port,
+                CONF_SCAN_INTERVAL_SECONDS: current_scan_interval,
+            },
+        )
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=schema,
             errors=errors,
         )
