@@ -61,7 +61,8 @@
         "state": {
           "None": "None",
           "Idle": "Idle",
-          "FocusOrUserCommand": "Focus / User command",
+          "Focus": "Focus",
+          "UserCommand": "User command",
           "Dispatch": "Dispatch"
         }
       },

@@ -114,7 +114,7 @@ SENSOR_TEMPLATES: tuple[NemesisSensorTemplate, ...] = (
             key="inverter_state",
             translation_key="inverter_state",
             device_class=SensorDeviceClass.ENUM,
-            options=["None", "Idle", "FocusOrUserCommand", "Dispatch"],
+            options=["None", "Idle", "Focus", "UserCommand", "Dispatch"],
         ),
         value_fn=_data_field("inverter_state"),
     ),
