@@ -1,0 +1,49 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Nemesis",
+        "description": "Enter the controller HTTP address (same port as mDNS).",
+        "data": {
+          "host": "Host or IP",
+          "port": "HTTP port"
+        }
+      },
+      "discovery_confirm": {
+        "title": "Nemesis discovered",
+        "description": "Found a Nemesis controller at {host}:{port}. Confirm to add it."
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach /status and /data on that address."
+    },
+    "abort": {
+      "no_host": "Discovery did not include a host address."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "grid_power": {
+        "name": "Grid power"
+      },
+      "nemesis_state": {
+        "name": "Controller state"
+      },
+      "ip_address": {
+        "name": "IP address"
+      },
+      "protocol": {
+        "name": "API protocol"
+      },
+      "unit_name": {
+        "name": "Unit name"
+      },
+      "unit_id": {
+        "name": "Unit ID"
+      },
+      "version_short": {
+        "name": "Software version"
+      }
+    }
+  }
+}
