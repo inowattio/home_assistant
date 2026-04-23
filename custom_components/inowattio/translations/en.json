@@ -56,6 +56,15 @@
       "pv_energy": {
         "name": "Solar energy"
       },
+      "inverter_state": {
+        "name": "Inverter state",
+        "state": {
+          "None": "None",
+          "Idle": "Idle",
+          "FocusOrUserCommand": "Focus / User command",
+          "Dispatch": "Dispatch"
+        }
+      },
       "nemesis_state": {
         "name": "Controller state"
       },

@@ -111,6 +111,15 @@ SENSOR_TEMPLATES: tuple[NemesisSensorTemplate, ...] = (
     _energy_sensor("pv_wh", "pv_energy"),
     NemesisSensorTemplate(
         SensorEntityDescription(
+            key="inverter_state",
+            translation_key="inverter_state",
+            device_class=SensorDeviceClass.ENUM,
+            options=["None", "Idle", "FocusOrUserCommand", "Dispatch"],
+        ),
+        value_fn=_data_field("inverter_state"),
+    ),
+    NemesisSensorTemplate(
+        SensorEntityDescription(
             key="nemesis_state",
             translation_key="nemesis_state",
         ),
