@@ -32,6 +32,9 @@
       "machine_id": {
         "name": "Machine ID"
       },
+      "ip_address": {
+        "name": "IP address"
+      },
       "unit_name": {
         "name": "Unit name"
       },
