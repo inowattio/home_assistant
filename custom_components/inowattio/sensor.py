@@ -62,6 +62,14 @@ SENSOR_TEMPLATES: tuple[NemesisSensorTemplate, ...] = (
     ),
     NemesisSensorTemplate(
         SensorEntityDescription(
+            key="machine_id",
+            translation_key="machine_id",
+            entity_category=EntityCategory.DIAGNOSTIC,
+        ),
+        value_fn=lambda d: (d.get("status") or {}).get("id"),
+    ),
+    NemesisSensorTemplate(
+        SensorEntityDescription(
             key="ip",
             translation_key="ip_address",
             entity_category=EntityCategory.DIAGNOSTIC,

@@ -29,6 +29,9 @@
       "nemesis_state": {
         "name": "Controller state"
       },
+      "machine_id": {
+        "name": "Machine ID"
+      },
       "ip_address": {
         "name": "IP address"
       },
