@@ -11,7 +11,9 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.components.sensor import SensorStateClass
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import PERCENTAGE
 from homeassistant.const import EntityCategory
+from homeassistant.const import UnitOfEnergy
 from homeassistant.const import UnitOfPower
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
@@ -50,18 +52,63 @@ def _short_machine_id(data: dict[str, Any]) -> str | None:
     return f"{raw[:8]}…{raw[-4:]}"
 
 
-SENSOR_TEMPLATES: tuple[NemesisSensorTemplate, ...] = (
-    NemesisSensorTemplate(
+def _data_field(key: str) -> Callable[[dict[str, Any]], StateType]:
+    def _get(d: dict[str, Any]) -> StateType:
+        return (d.get("data") or {}).get(key)
+
+    return _get
+
+
+def _power_sensor(key: str, translation_key: str) -> NemesisSensorTemplate:
+    return NemesisSensorTemplate(
         SensorEntityDescription(
-            key="grid_power",
-            translation_key="grid_power",
+            key=key,
+            translation_key=translation_key,
             native_unit_of_measurement=UnitOfPower.WATT,
             device_class=SensorDeviceClass.POWER,
             state_class=SensorStateClass.MEASUREMENT,
             suggested_display_precision=0,
         ),
-        value_fn=lambda d: (d.get("data") or {}).get("grid"),
+        value_fn=_data_field(key),
+    )
+
+
+def _energy_sensor(key: str, translation_key: str) -> NemesisSensorTemplate:
+    return NemesisSensorTemplate(
+        SensorEntityDescription(
+            key=key,
+            translation_key=translation_key,
+            native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+            device_class=SensorDeviceClass.ENERGY,
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            suggested_display_precision=0,
+        ),
+        value_fn=_data_field(key),
+    )
+
+
+SENSOR_TEMPLATES: tuple[NemesisSensorTemplate, ...] = (
+    _power_sensor("grid_w", "grid_power"),
+    _energy_sensor("grid_wh_abs", "grid_energy_imported"),
+    _energy_sensor("grid_wh_inj", "grid_energy_exported"),
+    _power_sensor("load_w", "load_power"),
+    _energy_sensor("load_wh", "load_energy"),
+    _power_sensor("battery_w", "battery_power"),
+    NemesisSensorTemplate(
+        SensorEntityDescription(
+            key="battery_soc",
+            translation_key="battery_soc",
+            native_unit_of_measurement=PERCENTAGE,
+            device_class=SensorDeviceClass.BATTERY,
+            state_class=SensorStateClass.MEASUREMENT,
+            suggested_display_precision=0,
+        ),
+        value_fn=_data_field("battery_soc"),
     ),
+    _energy_sensor("battery_wh_abs", "battery_energy_charged"),
+    _energy_sensor("battery_wh_inj", "battery_energy_discharged"),
+    _power_sensor("pv", "pv_power"),
+    _energy_sensor("pv_wh", "pv_energy"),
     NemesisSensorTemplate(
         SensorEntityDescription(
             key="nemesis_state",

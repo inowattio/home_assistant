@@ -26,6 +26,36 @@
       "grid_power": {
         "name": "Grid power"
       },
+      "grid_energy_imported": {
+        "name": "Grid energy imported"
+      },
+      "grid_energy_exported": {
+        "name": "Grid energy exported"
+      },
+      "load_power": {
+        "name": "Load power"
+      },
+      "load_energy": {
+        "name": "Load energy"
+      },
+      "battery_power": {
+        "name": "Battery power"
+      },
+      "battery_soc": {
+        "name": "Battery level"
+      },
+      "battery_energy_charged": {
+        "name": "Battery energy charged"
+      },
+      "battery_energy_discharged": {
+        "name": "Battery energy discharged"
+      },
+      "pv_power": {
+        "name": "Solar power"
+      },
+      "pv_energy": {
+        "name": "Solar energy"
+      },
       "nemesis_state": {
         "name": "Controller state"
       },
