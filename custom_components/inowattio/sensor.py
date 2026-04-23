@@ -41,6 +41,15 @@ def _ctx(data: dict[str, Any]) -> dict[str, Any]:
     return ctx if isinstance(ctx, dict) else {}
 
 
+def _short_machine_id(data: dict[str, Any]) -> str | None:
+    raw = (data.get("status") or {}).get("id")
+    if not isinstance(raw, str) or not raw:
+        return None
+    if len(raw) <= 12:
+        return raw
+    return f"{raw[:8]}…{raw[-4:]}"
+
+
 SENSOR_TEMPLATES: tuple[NemesisSensorTemplate, ...] = (
     NemesisSensorTemplate(
         SensorEntityDescription(
@@ -66,7 +75,7 @@ SENSOR_TEMPLATES: tuple[NemesisSensorTemplate, ...] = (
             translation_key="machine_id",
             entity_category=EntityCategory.DIAGNOSTIC,
         ),
-        value_fn=lambda d: (d.get("status") or {}).get("id"),
+        value_fn=_short_machine_id,
     ),
     NemesisSensorTemplate(
         SensorEntityDescription(
