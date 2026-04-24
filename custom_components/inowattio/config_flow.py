@@ -15,6 +15,9 @@ from homeassistant.const import CONF_PORT
 from homeassistant.core import HomeAssistant
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.selector import NumberSelector
+from homeassistant.helpers.selector import NumberSelectorConfig
+from homeassistant.helpers.selector import NumberSelectorMode
 
 try:
     from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
@@ -48,12 +51,14 @@ OPTIONS_STEP_DATA_SCHEMA = vol.Schema(
         vol.Required(
             CONF_SCAN_INTERVAL_SECONDS,
             default=DEFAULT_SCAN_INTERVAL_SECONDS,
-        ): vol.All(
-            vol.Coerce(int),
-            vol.Range(
+        ): NumberSelector(
+            NumberSelectorConfig(
                 min=MIN_SCAN_INTERVAL_SECONDS,
                 max=MAX_SCAN_INTERVAL_SECONDS,
-            ),
+                step=1,
+                mode=NumberSelectorMode.BOX,
+                unit_of_measurement="s",
+            )
         ),
     }
 )
