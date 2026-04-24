@@ -79,6 +79,7 @@ def _energy_sensor(key: str, translation_key: str) -> NemesisSensorTemplate:
             key=key,
             translation_key=translation_key,
             native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+            suggested_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
             device_class=SensorDeviceClass.ENERGY,
             state_class=SensorStateClass.TOTAL_INCREASING,
             suggested_display_precision=0,
@@ -121,7 +122,7 @@ SENSOR_TEMPLATES: tuple[NemesisSensorTemplate, ...] = (
     _energy_sensor("grid_wh_inj", "grid_energy_exported"),
     _power_sensor("load_w", "load_power"),
     _energy_sensor("load_wh", "load_energy"),
-    _fraction_sensor("load_from_grid_per", "load_from_grid_per"),
+    _fraction_sensor("load_from_grid", "load_from_grid"),
     _power_sensor("battery_w", "battery_power"),
     NemesisSensorTemplate(
         SensorEntityDescription(

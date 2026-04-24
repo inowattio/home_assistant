@@ -54,7 +54,7 @@
       "load_energy": {
         "name": "Load energy"
       },
-      "load_from_grid_per": {
+      "load_from_grid": {
         "name": "Load from grid"
       },
       "battery_power": {
