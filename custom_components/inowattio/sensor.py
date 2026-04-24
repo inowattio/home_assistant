@@ -209,8 +209,14 @@ class NemesisSensor(CoordinatorEntity[NemesisCoordinator], SensorEntity):
         ctx = status.get("context", {})
         unit_name = ctx.get("unit_name") if isinstance(ctx, dict) else None
         title = unit_name if isinstance(unit_name, str) and unit_name else "Nemesis"
-        host = self.coordinator.config_entry.data[CONF_HOST]
-        port = self.coordinator.config_entry.data[CONF_PORT]
+        host = self.coordinator.config_entry.options.get(
+            CONF_HOST, self.coordinator.config_entry.data[CONF_HOST]
+        )
+        port = int(
+            self.coordinator.config_entry.options.get(
+                CONF_PORT, self.coordinator.config_entry.data[CONF_PORT]
+            )
+        )
         base = http_base_url(host, port)
         return DeviceInfo(
             identifiers={(DOMAIN, str(machine_id))},
