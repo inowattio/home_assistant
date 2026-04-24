@@ -54,6 +54,9 @@
       "load_energy": {
         "name": "Load energy"
       },
+      "load_from_grid_per": {
+        "name": "Load from grid"
+      },
       "battery_power": {
         "name": "Battery power"
       },
@@ -71,6 +74,9 @@
       },
       "pv_energy": {
         "name": "Solar energy"
+      },
+      "pv_potential": {
+        "name": "Solar potential"
       },
       "inverter_state": {
         "name": "Inverter state",

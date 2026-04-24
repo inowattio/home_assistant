@@ -87,12 +87,41 @@ def _energy_sensor(key: str, translation_key: str) -> NemesisSensorTemplate:
     )
 
 
+def _ratio_percent(key: str) -> Callable[[dict[str, Any]], StateType]:
+    """Convert a 0..1 fraction from /data into a 0..100 percentage."""
+
+    def _get(d: dict[str, Any]) -> StateType:
+        raw = (d.get("data") or {}).get(key)
+        if raw is None:
+            return None
+        try:
+            return round(float(raw) * 100, 1)
+        except (TypeError, ValueError):
+            return None
+
+    return _get
+
+
+def _fraction_sensor(key: str, translation_key: str) -> NemesisSensorTemplate:
+    return NemesisSensorTemplate(
+        SensorEntityDescription(
+            key=key,
+            translation_key=translation_key,
+            native_unit_of_measurement=PERCENTAGE,
+            state_class=SensorStateClass.MEASUREMENT,
+            suggested_display_precision=0,
+        ),
+        value_fn=_ratio_percent(key),
+    )
+
+
 SENSOR_TEMPLATES: tuple[NemesisSensorTemplate, ...] = (
     _power_sensor("grid_w", "grid_power"),
     _energy_sensor("grid_wh_abs", "grid_energy_imported"),
     _energy_sensor("grid_wh_inj", "grid_energy_exported"),
     _power_sensor("load_w", "load_power"),
     _energy_sensor("load_wh", "load_energy"),
+    _fraction_sensor("load_from_grid_per", "load_from_grid_per"),
     _power_sensor("battery_w", "battery_power"),
     NemesisSensorTemplate(
         SensorEntityDescription(
@@ -109,6 +138,7 @@ SENSOR_TEMPLATES: tuple[NemesisSensorTemplate, ...] = (
     _energy_sensor("battery_wh_inj", "battery_energy_discharged"),
     _power_sensor("pv", "pv_power"),
     _energy_sensor("pv_wh", "pv_energy"),
+    _fraction_sensor("pv_pot", "pv_potential"),
     NemesisSensorTemplate(
         SensorEntityDescription(
             key="inverter_state",
